@@ -12,7 +12,7 @@ def do_deploy(archive_path):
     """Distributes an archive to a web server.
 
     Args:
-        archive_path (str): The path of the archive to distribute.
+        archive_path (str): The distribute path of the archive.
     Returns:
         If the file doesn't exist at archive_path or an error occurs - False.
         Otherwise - True.
@@ -46,6 +46,4 @@ def do_deploy(archive_path):
     if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
            format(name)).failed is True:
         return False
-
-     # return True on success
     return True

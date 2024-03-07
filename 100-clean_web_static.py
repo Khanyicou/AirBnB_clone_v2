@@ -6,35 +6,25 @@ from fabric.api import *
 env.hosts = ["104.196.168.90", "35.196.46.172"]
 
 
-def do_clean(number=1):
+def do_clean(number=0):
     """Delete out-of-date archives.
 
     Args:
-        number (int): The number of archives to keep.
+        number (int): The archives number to keep.
 
     If number is 0 or 1, keeps only the most recent archive. If
     number is 2, keeps the most and second-most recent archives,
     etc.
     """
-    number = int(number)
+    number = 1 if int(number) == 0 else int(number)
 
-    # Ensure we keep at least one archive
-    if number < 1:
-        number = 1
-
+    archives = sorted(os.listdir("versions"))
+    [archives.pop() for i in range(number)]
     with lcd("versions"):
-        # List all archives sorted by modification time
-        archives = sorted(os.listdir("."), key=os.path.getmtime)
-
-        # Remove all but the 'number' most recent archives
-        for archive in archives[:-number]:
-            local("rm -f {}".format(archive))
+        [local("rm ./{}".format(a)) for a in archives]
 
     with cd("/data/web_static/releases"):
-        # List all archives sorted by modification time
-        archives = run("ls -tr | grep web_static_").split()
-
-        # Remove all but the 'number' most recent archives
-        for archive in archives[:-number]:
-            run("rm -rf {}".format(archive))
-
+        archives = run("ls -tr").split()
+        archives = [a for a in archives if "web_static_" in a]
+        [archives.pop() for i in range(number)]
+        [run("rm -rf ./{}".format(a)) for a in archives]
