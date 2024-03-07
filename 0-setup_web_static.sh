@@ -1,24 +1,18 @@
 #!/usr/bin/env bash
+# Sets up a web server for deployment of web_static.
 
-# Update package lists
 apt-get update
-
-# Install Nginx
 apt-get install -y nginx
 
-# Set up directory structure
 mkdir -p /data/web_static/releases/test/
 mkdir -p /data/web_static/shared/
 echo "Holberton School" > /data/web_static/releases/test/index.html
 ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-# Set permissions
 chown -R ubuntu /data/
 chgrp -R ubuntu /data/
 
-# Configure Nginx
-cat >/etc/nginx/sites-available/default <<EOF
-server {
+printf %s "server {
     listen 80 default_server;
     listen [::]:80 default_server;
     add_header X-Served-By $HOSTNAME;
@@ -36,12 +30,9 @@ server {
 
     error_page 404 /404.html;
     location /404 {
-        root /var/www/html;
-        internal;
+      root /var/www/html;
+      internal;
     }
-}
-EOF
+}" > /etc/nginx/sites-available/default
 
-# Restart Nginx
 service nginx restart
-
